@@ -2,32 +2,32 @@ version: '2'
 
 services:
   mongo:
-    image: "mongo"
+    image: "mongo:3.4"
     ports:
       - "27017:27017"
-  mongo-clean:
-    image: "mongo"
-    entrypoint: "/usr/bin/env bash -c 'until mongo dashboarddb --host mongo --eval db.dropDatabase(); do >&2 echo Mongo is unavailable - sleeping & sleep 1; done'"
-    links:
-      - mongo
+
   mongo-populate-test:
-    image: "mongo"
+    image: "mongo:3.4"
     volumes:
       - ".:/temp"
     working_dir: "/temp"
-    entrypoint: "/usr/bin/env bash -c 'until mongo dashboarddb --host mongo < data/main.js; do >&2 echo Mongo is unavailable - sleeping & sleep 1; done'"
-    links:
+    entrypoint: "/usr/bin/env bash -c ' \
+      until mongo dashboarddb --host mongo --eval \"db.dropDatabase()\"; do >&2 echo Mongo is unavailable - sleeping & sleep 1; done && \
+      mongo dashboarddb --host mongo < data/main.js'"
+    depends_on:
       - mongo
-      - mongo-clean
+
   mongo-populate-dump:
-    image: "mongo"
+    image: "mongo:3.4"
     volumes:
       - "/tmp/latest_mongo_dump:/temp"
     working_dir: "/temp"
-    entrypoint: "/usr/bin/env bash -c 'until mongorestore --host mongo --db dashboarddb --drop /temp/dashboarddb; do >&2 echo Mongo is unavailable - sleeping & sleep 1; done'"
-    links:
+    entrypoint: "/usr/bin/env bash -c ' \
+      until mongo dashboarddb --host mongo --eval \"db.dropDatabase()\"; do >&2 echo Mongo is unavailable - sleeping & sleep 1; done && \
+      mongorestore --host mongo --db dashboarddb --drop /temp/dump/dashboarddb'"
+    depends_on:
       - mongo
-      - mongo-clean
+
   app:
     image: "openjdk:8-jdk"
     volumes:
@@ -35,7 +35,7 @@ services:
       - ../mirrorgate-dashboard/dist:/temp/public
       - ../mirrorgate-backoffice/dist:/temp/public/backoffice
       - ../mirrorgate-docs/dist:/temp/public/docs
-    links:
+    depends_on:
       - mongo
     working_dir: "/temp"
     environment:
@@ -48,30 +48,32 @@ services:
     ports:
       - "8080:8080"
       - "5005:5005"
+
   selenium-chrome:
-    image: "selenium/standalone-chrome:latest"
-    links: 
-      - app
+    image: "selenium/standalone-chrome:2.53.1"
     volumes:
       - /dev/shm:/dev/shm
+
   selenium-firefox:
     image: "selenium/standalone-firefox:latest"
-    links: 
-      - app
     volumes:
-      - /dev/shm:/dev/shm      
+      - /dev/shm:/dev/shm
+
   e2e-tests:
     image: "node:7"
-    volumes: 
+    volumes:
       - ".:/temp/"
     working_dir: "/temp"
-    links:
+    depends_on:
       - mongo-populate-test
+      - app
       - selenium-chrome
       - selenium-firefox
-    environment:
-      - DOCKER=true
-    entrypoint: "sh -c 'until curl http://app:8080/mirrorgate/health; do >&2 echo App is unavailable - sleeping & sleep 1; done && \
-        npm install && \
-        ./node_modules/.bin/protractor ./e2e/protractor.conf.js && \
-        BROWSER=firefox ./node_modules/.bin/protractor ./e2e/protractor.conf.js'"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        until curl http://app:8080/mirrorgate/dashboards/mirrorgate/details; do >&2 echo Dashboard is unavailable - sleeping & sleep 1; done
+        npm install
+        SELENIUM_HOST=selenium-chrome APP_HOST=app npm run e2e-tests
+        # BROWSER=firefox SELENIUM_HOST=selenium-firefox APP_HOST=app npm run e2e-tests

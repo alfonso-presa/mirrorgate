@@ -44,3 +44,62 @@ tag-input {
   height: 100%;
 }
 
+.checkbox {
+  height: 34px;
+  width: 34px;
+  margin: 0px 0 0;
+}
+
+.general-help {
+  text-align: right;
+}
+
+
+.dashboard-cols-template{
+  border: dashed 1px #aaa;
+  background-color: #fafafa;
+  padding: 10px;
+  margin: 15px 0px 15px 0px;
+  float: left;
+  width: 20%;
+  height: 370px;
+}
+
+.dashboard-cols-modules {
+
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 80px;
+
+  .dashboard-cols-module {
+    width: 20%;
+  }
+}
+
+.dashboard-cols-module {
+  cursor: move;
+  margin: 6px;
+  height: 80px;
+  background-color: #f0f0f0;
+
+  &.s-module {
+    height: 80px;
+  }
+
+  &.m-module {
+    height: 166px;
+  }
+
+  &.l-module {
+    height: 252px;
+  }
+
+  &.xl-module {
+    height: 338px;
+  }
+}
+
+.dashboard-cols-group {
+  float: left;
+  width: 25%;
+}

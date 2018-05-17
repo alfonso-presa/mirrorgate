@@ -65,7 +65,9 @@ var Service = (function() {
     this.addListener = function(callback) {
       event.attach(callback);
       this._checkEventRegistration();
-      this.request();
+      if(timer !== undefined){
+        this.request();
+      }
     };
 
     this.removeListener = function(callback) {
@@ -81,13 +83,17 @@ var Service = (function() {
         if(serviceType.serverEventType){
           ServerSentEvent.addListener(processServerEvent);
         }
-        timer.attach(callHttpService);
+        if(timer) {
+          timer.attach(callHttpService);
+        }
       } else if (!event.getListeners().length && this._attached) {
         this._attached = false;
         if(serviceType.serverEventType){
           ServerSentEvent.removeListener(processServerEvent);
         }
-        timer.detach(callHttpService);
+        if(timer) {
+          timer.detach(callHttpService);
+        }
       }
     };
 
@@ -113,6 +119,21 @@ var Service = (function() {
     };
   }
 
+  function NoTimerServiceType(resource, serverEventType) {
+    this._instances = {};
+    this.serverEventType = serverEventType;
+    this.getUrl = function(dashboardId) {
+      var url = 'dashboards/';
+      if (dashboardId) {
+        url += dashboardId + '/';
+        if (resource) {
+          url += resource;
+        }
+      }
+      return url;
+    };
+  }
+
   var self = {
     types: {
       builds: new ServiceType(Timer.eventually, 'builds','BuildType'),
@@ -124,6 +145,8 @@ var Service = (function() {
       programincrement: new ServiceType(Timer.eventually, 'programincrement', 'FeatureType'),
       notifications: new ServiceType(Timer.never, 'notifications'),
       userMetrics: new ServiceType(Timer.eventually, 'user-metrics'),
+      scmMetrics: new ServiceType(Timer.eventually, 'scm-metrics'),
+      eventNotifications: new NoTimerServiceType('event-notification', 'NotificationType'),
     },
     get: function(type, dashboardId) {
       return (

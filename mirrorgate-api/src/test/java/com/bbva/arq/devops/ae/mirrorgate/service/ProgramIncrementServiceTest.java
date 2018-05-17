@@ -4,15 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.DashboardDTO;
+import com.bbva.arq.devops.ae.mirrorgate.dto.DashboardDTO;
 import com.bbva.arq.devops.ae.mirrorgate.dto.ProgramIncrementDTO;
-import com.bbva.arq.devops.ae.mirrorgate.model.Dashboard;
 import com.bbva.arq.devops.ae.mirrorgate.repository.FeatureRepositoryImpl.ProgramIncrementNamesAggregationResult;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -20,9 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -60,13 +54,13 @@ public class ProgramIncrementServiceTest {
     @Test
     public void testProductIncrementNameWithUserDefinedRegex(){
 
-        List<String> piNamesList = Arrays.asList("AE_2017_PI03_(2016/12/04-2017/01/28)", "AE_2016_PI02_(2016/11/04-2016/12/03)");
+        List<String> piNamesList = Arrays.asList("AE_2017_PI03_(2016/12/04-2017/01/28)", "AE_2017_PI04_(2017/01/28-2017/04/14)", "AE_2016_PI02_(2016/11/04-2016/12/03)");
         ProgramIncrementNamesAggregationResult piNames = new ProgramIncrementNamesAggregationResult(piNamesList);
 
         when(featureService.getProductIncrementFromPiPattern(any(Pattern.class))).thenReturn(piNames);
-        ProgramIncrementDTO activePI = piService.getProductIncrementNameAndDatesForExpression("AE_2017_PI03_.*");
+        ProgramIncrementDTO activePI = piService.getProductIncrementNameAndDatesForExpression("AE_2017_PI0._.*");
 
-        assertEquals(activePI.getProgramIncrementName(), "AE_2017_PI03_(2016/12/04-2017/01/28)");
+        assertEquals("AE_2017_PI04_(2017/01/28-2017/04/14)", activePI.getProgramIncrementName());
     }
 
     @Test
@@ -91,8 +85,8 @@ public class ProgramIncrementServiceTest {
             LOGGER.error("Parse exception", e);
         }
 
-        assertEquals(activePI.getProgramIncrementStartDate(), expectedStartDate);
-        assertEquals(activePI.getProgramIncrementEndDate(), expectedEndDate);
+        assertEquals(expectedStartDate, activePI.getProgramIncrementStartDate());
+        assertEquals(expectedEndDate, activePI.getProgramIncrementEndDate());
     }
 
     @Test
@@ -106,7 +100,7 @@ public class ProgramIncrementServiceTest {
         when(featureService.getProductIncrementFromPiPattern(any(Pattern.class))).thenReturn(piNames);
         ProgramIncrementDTO activePI = piService.getProductIncrementNameAndDatesForExpression("(?<startDate>[0-9]{4}/[0-9]{2}/[0-9]{2})-(?<endDate>[0-9]{4}/[0-9]{2}/[0-9]{2})");
 
-        assertEquals(activePI.getProgramIncrementName(), expectedProductIncrement);
+        assertEquals(expectedProductIncrement, activePI.getProgramIncrementName());
     }
 
     @Test
@@ -120,7 +114,7 @@ public class ProgramIncrementServiceTest {
         when(featureService.getProductIncrementFromPiPattern(any(Pattern.class))).thenReturn(piNames);
         ProgramIncrementDTO activePI = piService.getProductIncrementNameAndDatesForExpression("(?<startDate>[0-9]{4}/[0-9]{2}/[0-9]{2})-(?<endDate>[0-9]{4}/[0-9]{2}/[0-9]{2})");
 
-        assertEquals(activePI.getProgramIncrementName(), expectedProductIncrement);
+        assertEquals(expectedProductIncrement, activePI.getProgramIncrementName());
     }
 
     private String generateProductIncrementName(int months){

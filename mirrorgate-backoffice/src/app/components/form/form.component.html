@@ -22,8 +22,8 @@
   </h2>
 
   <div class="white-bg">
-
     <form (ngSubmit)="onSave(dashboard)" #dashboardForm="ngForm" *ngIf="dashboard">
+      <div class="general-help" innerHTML="{{texts.form.general_help}}"></div>
 
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -33,7 +33,7 @@
           <div class="form-group row">
             <div [ngClass]="{'col-sm-6':categories, 'col-sm-12':!categories}">
               <label for="displayName">{{texts.form.general_block.display_name_input}} (*)</label>
-              <input type="text" class="form-control" id="displayName" [(ngModel)]="dashboard.displayName" (ngModelChange)="mirrorTempValues()" name="displayName" #name="ngModel" required>
+              <input type="text" class="form-control" id="displayName" [(ngModel)]="temp.displayName" (ngModelChange)="mirrorTempValues()" name="displayName" #name="ngModel" required>
             </div>
             <div class="col-sm-6" *ngIf="categories">
               <div class="form-group">
@@ -62,9 +62,9 @@
                 <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#icon-url-help" aria-expanded="false" aria-controls="icon-url-help">
                   <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                 </a>
-                <input *ngIf="dashboard.logoUrl != '#UPLOADED#'" type="text" class="form-control" id="logoURL" [(ngModel)]="dashboard.logoUrl" name="logoURL">
+                <input *ngIf="dashboard.logoUrl != '#UPLOADED#'" type="text" class="form-control" id="logoURL" [(ngModel)]="temp.logoUrl" (ngModelChange)="mirrorTempValues()" name="logoURL">
                 <input *ngIf="dashboard.logoUrl == '#UPLOADED#'" type="text" readonly="true" class="form-control" value="Uploaded picture">
-                <a *ngIf="edit && dashboard.logoUrl == '#UPLOADED#'" type="button" (click)="dashboard.logoUrl = undefined" class="input-group-addon">
+                <a *ngIf="edit && dashboard.logoUrl == '#UPLOADED#'" type="button" (click)="dashboard.logoUrl = undefined; temp.logoUrl = undefined" class="input-group-addon">
                   <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
                 </a>
                 <a *ngIf="edit" type="button" (click)="icon = {}" class="input-group-addon" data-toggle="modal" data-target="#iconModal">
@@ -131,12 +131,12 @@
               <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#admin-users-help" aria-expanded="false" aria-controls="admin-users-help">
                 <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
               </a>
-              <tag-input class="form-control" id="adminUsers" name="adminUsers" [(ngModel)]="temp.adminUsers" (ngModelChange)="mirrorTempValues()" placeholder="{{texts.form.general_block.admin_list_placeholder}}" secondaryPlaceholder="{{texts.form.general_block.admin_list_secondary_placeholder}}"></tag-input>
+              <tag-input class="form-control" id="adminUsers" name="adminUsers" [(ngModel)]="temp.adminUsers" (ngModelChange)="mirrorTempValues()" placeholder="{{texts.form.general_block.admin_list_placeholder}}" secondaryPlaceholder="{{texts.form.general_block.admin_list_secondary_placeholder}}" separatorKeys="[',',' ']" addOnBlur=true dragZone="adminList"></tag-input>
             </div>
           </div>
 
           <div class="form-group row">
-            <div class="col-sm-6" *ngIf="!edit">
+            <div class="col-sm-6">
               <label for="type">{{texts.form.general_block.board_type_text}}</label>
               <div class="collapse" id="board-type-help">
                 <div class="well" innerHTML="{{texts.form.general_block.board_type_help}}"></div>
@@ -160,7 +160,9 @@
                 <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#dashboard-ids-help" aria-expanded="false" aria-controls="dashboard-ids-help">
                   <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                 </a>
-                <tag-input class="form-control" id="aggregatedDashboards" name="aggregatedDashboards" [(ngModel)]="temp.aggregatedDashboards" (ngModelChange)="mirrorTempValues()" placeholder="Add a new dashboard" secondaryPlaceholder="Add a new dashboard"></tag-input>
+                <tag-input class="form-control" id="aggregatedDashboards" name="aggregatedDashboards" [(ngModel)]="temp.aggregatedDashboards" (ngModelChange)="mirrorTempValues()" placeholder="Add a new dashboard" secondaryPlaceholder="Add a new dashboard" separatorKeys="[',',' ']" addOnBlur=true dragZone="aggregatedList" [onlyFromAutocomplete]="true">
+                  <tag-input-dropdown [autocompleteItems]="dashboardList"></tag-input-dropdown>
+                </tag-input>
               </div>
 
             </div>
@@ -196,7 +198,7 @@
                 <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#product-increment-help" aria-expanded="false" aria-controls="code-repos-help">
                   <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                 </a>
-                <input type="text" class="form-control" id="programIncrement" [(ngModel)]="dashboard.programIncrement" name="programIncrement">
+                <input type="text" class="form-control" id="programIncrement" [(ngModel)]="temp.programIncrement" (ngModelChange)="mirrorTempValues()" name="programIncrement">
               </div>
             </div>
           </div>
@@ -229,7 +231,28 @@
               <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#team-members-help" aria-expanded="false" aria-controls="team-members-help">
                 <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
               </a>
-              <tag-input class="form-control" id="teamMembers" name="teamMembers" [(ngModel)]="temp.teamMembers" (ngModelChange)="mirrorTempValues()" placeholder="{{texts.form.ci_block.team_members_list_placeholder}}" secondaryPlaceholder="{{texts.form.ci_block.team_members_list_secondary_placeholder}}"></tag-input>
+              <tag-input class="form-control" id="teamMembers" name="teamMembers" [(ngModel)]="temp.teamMembers" (ngModelChange)="mirrorTempValues()" placeholder="{{texts.form.ci_block.team_members_list_placeholder}}" secondaryPlaceholder="{{texts.form.ci_block.team_members_list_secondary_placeholder}}" separatorKeys="[',',' ']" addOnBlur=true dragZone="teamList"></tag-input>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="dashboard.type!='Aggregate'" class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{texts.form.commits_block.title}}</h3>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label for="commitsRepos">{{texts.form.commits_block.repos_input}}</label>
+            <div class="collapse" id="commits-repos-help">
+              <div class="well" innerHTML="{{texts.form.commits_block.commits_repos_help}}"></div>
+            </div>
+            <div class="input-group">
+              <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#commits-repos-help" aria-expanded="false" aria-controls="commits-repos-help">
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+              </a>
+              <input type="text" class="form-control" id="gitRepos" [(ngModel)]="temp.gitRepos" (ngModelChange)="mirrorTempValues()" name="gitRepos">
             </div>
           </div>
         </div>
@@ -241,38 +264,59 @@
           <h3 class="panel-title">{{texts.form.markets_block.title}}</h3>
         </div>
         <div class="panel-body">
-          <div class="form-group col-sm-6">
-            <label for="applications">{{texts.form.markets_block.apps_input}}</label>
-            <div class="collapse" id="applications-help">
-              <div class="well" innerHTML="{{texts.form.markets_block.apps_help}}"></div>
+          <div class="form-group row">
+
+            <div class="form-group col-sm-6">
+              <label for="applications">{{texts.form.markets_block.apps_input}}</label>
+              <div class="collapse" id="applications-help">
+                <div class="well" innerHTML="{{texts.form.markets_block.apps_help}}"></div>
+              </div>
+              <div class="input-group">
+                <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#applications-help" aria-expanded="false"
+                  aria-controls="applications-help">
+                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </a>
+                <input type="text" class="form-control" id="applications" [(ngModel)]="temp.applications" (ngModelChange)="mirrorTempValues()"
+                  name="applications">
+              </div>
             </div>
-            <div class="input-group">
-              <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#applications-help" aria-expanded="false"
-                aria-controls="applications-help">
-                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              </a>
-              <input type="text" class="form-control" id="applications" [(ngModel)]="temp.applications" (ngModelChange)="mirrorTempValues()"
-                name="applications">
+
+            <div class="col-sm-6">
+              <label for="lastVersion">{{texts.form.markets_block.stats_days}}</label>
+              <div class="collapse" id="stats-days-help">
+                <div class="well" innerHTML="{{texts.form.markets_block.stats_days_help}}"></div>
+              </div>
+              <div class="input-group">
+                <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#stats-days-help" aria-expanded="false"
+                  aria-controls="stats-days-help">
+                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </a>
+                <select type="text" class="form-control" id="stats_days" [(ngModel)]="dashboard.marketsStatsDays" name="statsDays">
+                  <option value="7">7 days</option>
+                  <option value="15">15 days</option>
+                  <option value="30">30 days</option>
+                </select>
+              </div>
             </div>
+
+          </div>
+          <div class="form-group row">
+
+            <div class="col-sm-6">
+              <label for="lastVersion">{{texts.form.markets_block.last_version_input}}</label>
+              <div class="collapse" id="last-version-help">
+                <div class="well" innerHTML="{{texts.form.markets_block.last_version_help}}"></div>
+              </div>
+              <div class="input-group">
+                <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#last-version-help" aria-expanded="false" aria-controls="infra-cost-help">
+                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </a>
+                <input type="text" class="form-control" id="lastVersion" [(ngModel)]="temp.lastVersion" (ngModelChange)="mirrorTempValues()" name="lastVersion">
+              </div>
+            </div>
+
           </div>
 
-          <div class="col-sm-6">
-            <label for="lastVersion">{{texts.form.markets_block.stats_days}}</label>
-            <div class="collapse" id="stats-days-help">
-              <div class="well" innerHTML="{{texts.form.markets_block.stats_days_help}}"></div>
-            </div>
-            <div class="input-group">
-              <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#stats-days-help" aria-expanded="false"
-                 aria-controls="stats-days-help">
-                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              </a>
-              <select type="text" class="form-control" id="stats_days" [(ngModel)]="dashboard.marketsStatsDays" name="statsDays">
-                <option value="7">7 days</option>
-                <option value="15">15 days</option>
-                <option value="30">30 days</option>
-              </select>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -281,20 +325,50 @@
           <h3 class="panel-title">{{texts.form.analytics_block.title}}</h3>
         </div>
         <div class="panel-body">
-          <div class="col-sm-6">
-            <label for="viewIds">{{texts.form.analytics_block.analytics_input}}</label>
-            <div class="collapse" id="view-ids-help">
-              <div class="well" innerHTML="{{texts.form.analytics_block.analytics_help}}"></div>
+
+          <div class="form-group row">
+
+            <div class="col-sm-6">
+              <label for="analyticsIds">{{texts.form.analytics_block.analytics_input}}</label>
+              <div class="collapse" id="analytics-ids-help">
+                <div class="well" innerHTML="{{texts.form.analytics_block.analytics_help}}"></div>
+              </div>
+              <div class="input-group">
+                <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#analytics-ids-help" aria-expanded="false"
+                   aria-controls="analytics-ids-help">
+                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </a>
+                <input type="text" class="form-control" id="analyticsIds" [(ngModel)]="temp.analyticViews" (ngModelChange)="mirrorTempValues()" name="analyticsIds">
+              </div>
             </div>
-            <div class="input-group">
-              <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#view-ids-help" aria-expanded="false"
-                aria-controls="view-ids-help">
-                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              </a>
-              <input type="text" class="form-control" id="viewIds" [(ngModel)]="temp.analyticViews" (ngModelChange)="mirrorTempValues()" name="viewIds">
-              <a type="button" (click)="icon = {}" class="input-group-addon" data-toggle="modal" data-target="#alertingLevelsModal">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-              </a>
+
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="dashboard.type!='Aggregate'" class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{texts.form.operations_block.title}}</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="form-group row">
+
+            <div class="col-sm-6">
+              <label for="operationsIds">{{texts.form.operations_block.operations_input}}</label>
+              <div class="collapse" id="operations-ids-help">
+                <div class="well" innerHTML="{{texts.form.operations_block.operations_help}}"></div>
+              </div>
+              <div class="input-group">
+                <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#operations-ids-help" aria-expanded="false"
+                  aria-controls="operations-ids-help">
+                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </a>
+                <input type="text" class="form-control" id="operationsIds" [(ngModel)]="temp.operationViews" (ngModelChange)="mirrorTempValues()" name="operationsIds">
+                <a type="button" (click)="icon = {}" class="input-group-addon" data-toggle="modal" data-target="#alertingLevelsModal">
+                  <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                </a>
+              </div>
             </div>
 
             <!-- Alerting levels Modal -->
@@ -304,7 +378,7 @@
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="alertingLevelsModalLabel">
-                      {{texts.form.analytics_block.alerting_levels}}
+                      {{texts.form.operations_block.alerting_levels}}
                       <a data-toggle="collapse" data-target="#alerting-levels-help" aria-expanded="false" aria-controls="alerting-levels-help">
                       <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                       </a>
@@ -312,12 +386,12 @@
                   </div>
                   <div class="modal-body">
                     <div class="collapse" id="alerting-levels-help">
-                      <div class="well" innerHTML="{{texts.form.analytics_block.alerting_levels_help}}"></div>
+                      <div class="well" innerHTML="{{texts.form.operations_block.alerting_levels_help}}"></div>
                     </div>
 
-                    <h5 for="iconModal">{{texts.form.analytics_block.response_time_alerting_levels}}</h5>
+                    <h5 for="iconModal">{{texts.form.operations_block.response_time_alerting_levels}}</h5>
 
-                    <p><label for="responseTimeAlertingLevelWarningRange">{{texts.form.analytics_block.response_time_alerting_level_warning_input}}:</label></p>
+                    <p><label for="responseTimeAlertingLevelWarningRange">{{texts.form.operations_block.response_time_alerting_level_warning_input}}:</label></p>
                     <div class="form-group row">
                       <div class="col-sm-3">
                         <input type="number" class="form-control" id="responseTimeAlertingLevelWarning" name="responseTimeAlertingLevelWarning" min="0" max="10" step="0.1" [(ngModel)]="dashboard.responseTimeAlertingLevelWarning">
@@ -330,7 +404,7 @@
                       </div>
                     </div>
 
-                    <p><label for="responseTimeAlertingLevelErrorRange">{{texts.form.analytics_block.response_time_alerting_level_error_input}}:</label></p>
+                    <p><label for="responseTimeAlertingLevelErrorRange">{{texts.form.operations_block.response_time_alerting_level_error_input}}:</label></p>
                     <div class="form-group row">
                       <div class="col-sm-3">
                         <input type="number" class="form-control" id="responseTimeAlertingLevelError" name="responseTimeAlertingLevelError" min="0" max="10" step="0.1" [(ngModel)]="dashboard.responseTimeAlertingLevelError">
@@ -343,9 +417,9 @@
                       </div>
                     </div>
 
-                    <h5 for="iconModal">{{texts.form.analytics_block.errors_rate_alerting_levels}}</h5>
+                    <h5 for="iconModal">{{texts.form.operations_block.errors_rate_alerting_levels}}</h5>
 
-                    <p><label for="errorsRateAlertingLevelWarningRange">{{texts.form.analytics_block.errors_rate_alerting_level_warning_input}}:</label></p>
+                    <p><label for="errorsRateAlertingLevelWarningRange">{{texts.form.operations_block.errors_rate_alerting_level_warning_input}}:</label></p>
                     <div class="form-group row">
                       <div class="col-sm-3">
                         <input type="number" class="form-control" id="errorsRateAlertingLevelWarning" name="errorsRateAlertingLevelWarning" min="0" max="10" step="0.1" [(ngModel)]="dashboard.errorsRateAlertingLevelWarning">
@@ -358,7 +432,7 @@
                       </div>
                     </div>
 
-                    <p><label for="errorsRateAlertingLevelErrorRange">{{texts.form.analytics_block.errors_rate_alerting_level_error_input}}:</label></p>
+                    <p><label for="errorsRateAlertingLevelErrorRange">{{texts.form.operations_block.errors_rate_alerting_level_error_input}}:</label></p>
                     <div class="form-group row">
                       <div class="col-sm-3">
                         <input type="number" class="form-control" id="errorsRateAlertingLevelError" name="errorsRateAlertingLevelError" min="0" max="10" step="0.1" [(ngModel)]="dashboard.errorsRateAlertingLevelError">
@@ -385,18 +459,19 @@
             </div>
             <!-- /Modal -->
 
-          </div>
-          <div class="col-sm-6">
-            <label for="lastVersion">{{texts.form.analytics_block.last_version_input}}</label>
-            <div class="collapse" id="last-version-help">
-              <div class="well" innerHTML="{{texts.form.analytics_block.last_version_help}}"></div>
+            <div class="col-sm-6">
+              <label for="infraCost">{{texts.form.operations_block.infra_cost_input}}</label>
+              <div class="collapse" id="infra-cost-help">
+                <div class="well" innerHTML="{{texts.form.operations_block.infra_cost_help}}"></div>
+              </div>
+              <div class="input-group">
+                <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#infra-cost-help" aria-expanded="false" aria-controls="infra-cost-help">
+                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                </a>
+                <input type="checkbox" class="checkbox" id="infraCost" [(ngModel)]="temp.infraCost" (ngModelChange)="mirrorTempValues()" name="infraCost">
+              </div>
             </div>
-            <div class="input-group">
-              <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#last-version-help" aria-expanded="false" aria-controls="code-repos-help">
-                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-              </a>
-              <input type="text" class="form-control" id="lastVersion" [(ngModel)]="dashboard.lastVersion" name="lastVersion">
-            </div>
+
           </div>
         </div>
       </div>
@@ -418,7 +493,7 @@
                 <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#slack_team-help" aria-expanded="false" aria-controls="slack_team-help">
                   <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                 </a>
-                <input type="text" class="form-control" id="slack_team" [(ngModel)]="dashboard.slackTeam" name="slack_team" #name="ngModel" placeholder="{{texts.form.alerts_block.slack_placeholder}}">
+                <input type="text" class="form-control" id="slack_team" [(ngModel)]="temp.slackTeam" (ngModelChange)="mirrorTempValues()" name="slack_team" #name="ngModel" placeholder="{{texts.form.alerts_block.slack_placeholder}}">
                 <select *ngIf="slackChannels.keys" class="form-control" [(ngModel)]="dashboard.slackChannel" name="slack_channel">
                   <option></option>
                   <option *ngFor="let id of slackChannels.keys" [value]="id">{{slackChannels.values[id]}}</option>
@@ -482,8 +557,44 @@
                 <a type="button" class="input-group-addon" data-toggle="collapse" data-target="#urlAlerts-help" aria-expanded="false" aria-controls="urlAlerts-help">
                   <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                 </a>
-                <input type="text" class="form-control" id="urlAlerts" [(ngModel)]="dashboard.urlAlerts" name="urlAlerts" placeholder="{{texts.form.alerts_block.alerts_url_placeholder}}">
-                <input type="text" class="form-control" id="urlAlertsAuthorization" [(ngModel)]="dashboard.urlAlertsAuthorization" name="urlAlertsAuthorization" placeholder="{{texts.form.alerts_block.alerts_auth_header_placeholder}}">
+                <input type="text" class="form-control" id="urlAlerts" [(ngModel)]="temp.urlAlerts" (ngModelChange)="mirrorTempValues()" name="urlAlerts" placeholder="{{texts.form.alerts_block.alerts_url_placeholder}}">
+                <input type="text" class="form-control" id="urlAlertsAuthorization" [(ngModel)]="temp.urlAlertsAuthorization" (ngModelChange)="mirrorTempValues()" name="urlAlertsAuthorization" placeholder="{{texts.form.alerts_block.alerts_auth_header_placeholder}}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="dashboard.type!='Aggregate'" class="panel panel-default" id="dynamicDashboardConfiguration" >
+        <div class="panel-heading">
+          <h3 class="panel-title">{{texts.form.columns_block.title}}</h3>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label for="columns">{{texts.form.columns_block.dashboard}}</label>
+            <div id="columns">
+              <div id="col1" class="dashboard-cols-template" [dragula]='"columns"'></div>
+              <div id="col2" class="dashboard-cols-template" [dragula]='"columns"'></div>
+              <div id="col3" class="dashboard-cols-template" [dragula]='"columns"'></div>
+              <div id="col4" class="dashboard-cols-template" [dragula]='"columns"'></div>
+              <div id="col5" class="dashboard-cols-template" [dragula]='"columns"'></div>
+            </div>
+
+            <div>
+              <label for="columns">{{texts.form.columns_block.modules}}</label>
+              <div class="dashboard-cols-modules" [dragula]='"columns"'>
+                <div id="current-sprint" class="dashboard-cols-module m-module" size="2">{{texts.form.columns_block.modules_block.current_sprint}}</div>
+                <div id="program-increment" class="dashboard-cols-module m-module" size="2">{{texts.form.columns_block.modules_block.program_increment}}</div>
+                <div id="bugs" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.bugs}}</div>
+                <div id="scm-metrics" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.scm_metrics}}</div>
+                <div id="alerts" class="dashboard-cols-module xl-module" size="4">{{texts.form.columns_block.modules_block.alerts}}</div>
+                <div id="next-sprint" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.next_sprint}}</div>
+                <div id="builds" class="dashboard-cols-module m-module" size="2">{{texts.form.columns_block.modules_block.builds}}</div>
+                <div id="buildsstats" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.buildsstats}}</div>
+                <div id="markets" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.markets}}</div>
+                <div id="reviews" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.reviews}}</div>
+                <div id="user-metrics" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.user_metrics}}</div>
+                <div id="operations-metrics" class="dashboard-cols-module s-module" size="1">{{texts.form.columns_block.modules_block.operations_metrics}}</div>
               </div>
             </div>
           </div>

@@ -27,7 +27,7 @@
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: space-between;
 
       .platform-rate:last-child {
           margin-bottom: 0;
@@ -35,10 +35,7 @@
     }
 
     .platform-rate {
-        flex: 1 1 20%;
-        margin: 0 auto 20px auto;
-        min-width: 70vw;
-        max-width: 350px;
+        margin: 5px auto;
 
         .rate__os {
             -webkit-text-stroke-color: #b3b3b3;
@@ -111,6 +108,7 @@
 
     .review {
         cursor: pointer;
+
         &:hover .review-contents{
             background-color: lighten($color: $review-background-color, $amount: 1) ;
         }
@@ -153,7 +151,7 @@
     .review-contents {
 
       margin: 0 7.5px;
-      padding: 15px;
+      padding: 10px;
       background-color: $review-background-color;
       height: 100%;
       box-sizing: border-box;
@@ -181,9 +179,6 @@
     .applications{
 
         &.simple {
-           .rate__tag {
-             display:block;
-           }
            .rate-stars {
              text-align: center;
            }
@@ -194,11 +189,10 @@
         }
         .platform-rate{
             font-size: $level-3 + 0.2;
-            min-width: 15vw;
 
             .rate__total {
                 .fa {
-                    font-size: $level-2 + 0.4;
+                    font-size: $level-2 + 0.2;
                 }
 
             }
@@ -206,10 +200,6 @@
             .rate__tag {
                 font-size: $level-2 - 0.2;
 
-            }
-
-            .tendency:before {
-                font-size: $level-2 - 0.3;
             }
 
             .rate__total-data {
@@ -235,10 +225,8 @@
 
     .reviews-list {
         font-size: $level-4 - 0.1;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: stretch;
+        display: grid;
+        grid-row-gap: 10px;
         height: 100%;
 
         .review-contents {
@@ -251,11 +239,11 @@
         }
 
         .review__rate {
-            margin: 8px 0;
-            line-height: 1em;
+            margin: 5px 0 5px 0;
+            line-height: 0.7em;
 
             .fa{
-                font-size: $level-2 + 0.4;
+                font-size: $level-2 + 0.2;
             }
 
             > .fa {
@@ -280,28 +268,32 @@
         .review {
           flex: 1 1 50%;
           overflow: hidden;
-          margin-bottom: 15px;
-          min-width: 20vw;
+          min-width: 15vw;
         }
 
         .review__name {
           max-width: 9vw;
         }
 
-        &.layout-1x1 .review, &.layout-1x2 .review {
-          flex-basis: 100%;
+        &.layout-1x1, &.layout-1x2 {
+            grid-template-columns: 1fr;
         }
 
-        &.layout-2x1 .review, &.layout-2x2 .review {
-          flex-basis: 50%;
+        &.layout-2x1, &.layout-2x2 {
+            grid-template-columns: 1fr 1fr;
         }
 
-        &.layout-3x1 .review, &.layout-3x2 .review{
-          flex-basis: 33.33%;
+        &.layout-3x1, &.layout-3x2{
+            grid-template-columns: 1fr 1fr 1fr;
         }
 
-        &.layout-4x1 .review, &.layout-4x2 .review{
-          flex-basis: 25%;
+        &.layout-3x2,
+        &.layout-4x2{
+            grid-template-rows: 1fr 1fr;
+        }
+
+        &.layout-4x1, &.layout-4x2{
+            grid-template-columns: 1fr 1fr 1fr 1fr;
         }
 
         .review:nth-last-child(n+3),
@@ -333,5 +325,11 @@
             font-size: $level-2 + 1;
             padding-right: 2px;
         }
+    }
+}
+
+.tile {
+    simple-markets {
+        margin: 0;
     }
 }

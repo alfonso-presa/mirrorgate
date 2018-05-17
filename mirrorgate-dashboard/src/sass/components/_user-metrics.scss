@@ -19,11 +19,10 @@
 .users {
 
   .versions {
-    padding-top: 10px;
 
     ol {
       list-style: none;
-      margin-bottom: 0;
+      margin: 0;
       padding: 0;
     }
 
@@ -33,16 +32,8 @@
       .version-usage {
         flex: 1 1 90%;
 
-        .progress-bar {
-          float: left;
-        }
-
-        .version-legend {
-          padding-left: 10px;
-        }
-
         .progress__bar {
-          margin-top: 0.2em;
+          margin-top: 0.35em;
           width: 100%;
         }
       }
@@ -53,7 +44,11 @@
         flex: 1 1 10%;
       }
     }
+  }
+}
 
-
+.simple-users {
+  .component__body {
+    padding: 15px 15px 0px 15px;
   }
 }

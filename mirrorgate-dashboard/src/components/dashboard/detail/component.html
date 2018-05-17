@@ -26,6 +26,7 @@
 <link rel="import" href="../../tiles/markets/reviews-component.html">
 <link rel="import" href="../../tiles/programIncrement/component.html">
 <link rel="import" href="../../tiles/bugs/component.html" >
+<link rel="import" href="../../tiles/scm-metrics/component.html" >
 <link rel="import" href="../../tiles/notifications/component.html" >
 <link rel="import" href="../../tiles/dashboard-notifications/component.html" >
 <link rel="import" href="../../tiles/alerts/component.html" >
@@ -35,14 +36,6 @@
 <template>
   <style>
     @import "css/{skin}.css";
-
-    .header {
-      width: 100%;
-    }
-
-    .subheader {
-      flex: 1 1 auto;
-    }
 
     board-column.container {
       max-height: 100%;
@@ -56,62 +49,30 @@
 
   </style>
   <div>
-    <header-component class="header" rv-config="config"></header-component>
+    <!-- .dashboard -->
     <div class="dashboard adaptable" rv-class-with-footer="layout.withFooter">
-      <board-column>
-        <board-row class="row--primary">
-          <tile-container class="tile--primary">
-            <current-sprint-tile rv-config="config" class="tile component tile--primary"></current-sprint-tile>
-          </tile-container>
-          <tile-container class="tile--primary">
-            <program-increment-tile rv-config="config" class="tile component tile--primary"></program-increment-tile>
+      <board-column rv-each-column="columns">
+        <board-row rv-each-tile="column">
+          <tile-container>
+            <scm-metrics-tile rv-if="tile | = 'scm-metrics'" rv-config="config" class="tile" data-size="m"></scm-metrics-tile>
+            <current-sprint-tile rv-if="tile | = 'current-sprint'" rv-config="config" class="tile" data-size="l"></current-sprint-tile>
+            <program-increment-tile rv-if="tile | = 'program-increment' " rv-config="config" class="tile" data-size="l"></program-increment-tile>
+            <bugs-tile rv-if="tile | = 'bugs' " rv-config="config" class="tile" data-size="s"></bugs-tile>
+            <next-sprint-tile rv-if="tile | = 'next-sprint'" rv-config="config" class="tile" data-size="s"></next-sprint-tile>
+            <builds-tile rv-if="tile | = 'builds'" rv-config="config" class="tile" data-size="l"></builds-tile>
+            <buildsstats-tile rv-if="tile | = 'buildsstats'" rv-config="config" class="tile" data-size="m"></buildsstats-tile>
+            <markets-tile rv-if="tile | = 'markets'" rv-config="config" class="tile" data-size="m"></markets-tile>
+            <reviews-tile rv-if="tile | = 'reviews'" rv-config="config" class="tile" data-size="l"></reviews-tile>
+            <user-metrics-tile rv-if="tile | = 'user-metrics'" rv-config="config" class="tile" data-size="m"></user-metrics-tile>
+            <operations-metrics-tile rv-if="tile | = 'operations-metrics'" rv-config="config" class="tile" data-size="m"></operations-metrics-tile>
+            <alerts-tile rv-if="tile | = 'alerts'" rv-config="config" class="tile" data-size="fixed-right"></alerts-tile>
           </tile-container>
 
         </board-row>
 
-        <board-row>
-          <tile-container class="tile--secondary">
-            <bugs-tile rv-config="config" class="tile component"></bugs-tile>
-          </tile-container>
-          <tile-container class="tile--secondary">
-            <next-sprint-tile rv-config="config" class="tile component"></next-sprint-tile>
-          </tile-container>
-        </board-row>
-      </board-column>
-
-      <board-column>
-        <tile-container class="tile--primary">
-          <builds-tile rv-config="config" class="tile component tile--primary"></builds-tile>
-        </tile-container>
-
-        <tile-container class="tile--secondary">
-          <buildsstats-tile rv-config="config" class="tile component"></buildsstats-tile>
-        </tile-container>
-
-      </board-column>
-
-      <board-column>
-        <tile-container class="tile">
-          <markets-tile rv-config="config" class="markets component keep-height"></markets-tile>
-        </tile-container>
-        <tile-container class="tile full-height--tile">
-          <reviews-tile rv-config="config" class="markets component"></reviews-tile>
-        </tile-container>
-        <tile-container class="tile user-metrics tile--secondary">
-          <user-metrics-tile rv-config="config" class="component keep-height"></user-metrics-tile>
-        </tile-container>
-        <tile-container class="tile tile--secondary">
-          <operations-metrics-tile rv-config="config" class="component keep-height"></operations-metrics-tile>
-        </tile-container>
-      </board-column>
-
-      <board-column class="alerts-column">
-        <tile-container class="tile alerts tile--primary">
-          <alerts-tile rv-config="config" ></alerts-tile>
-        </tile-container>
       </board-column>
     </div>
-      <!-- / .dashboard -->
+    <!-- / .dashboard -->
 
     <!-- .bottom -->
     <board-row class="bottom" rv-enabled="layout.withFooter">
@@ -123,6 +84,7 @@
       </board-column>
     </board-row>
     <!-- / .bottom -->
+
   </div>
 </template>
 
@@ -137,6 +99,23 @@
     render: function (config) {
       this.getModel().layout.withFooter =
           config.slackTeam || (config.codeRepos && config.codeRepos.length) ? true: false;
+
+      if(config.columns
+        && ((config.columns[0] && config.columns[0].length > 0) ||
+            (config.columns[1] && config.columns[1].length > 0) ||
+            (config.columns[2] && config.columns[2].length > 0) ||
+            (config.columns[3] && config.columns[3].length > 0) ||
+            (config.columns[4] && config.columns[4].length > 0))) {
+        var columns = config.columns;
+      }else{
+        var columns = new Array(5);
+        columns[0] = new Array("bugs", "current-sprint", "next-sprint");
+        columns[1] = new Array("scm-metrics", "program-increment");
+        columns[2] = new Array("builds","buildsstats");
+        columns[3] = new Array("markets","reviews","user-metrics","operations-metrics");
+        columns[4] = new Array("alerts");
+      }
+      this.getModel().columns = columns;
     }
   });
 </script>

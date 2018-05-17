@@ -1,0 +1,14 @@
+custom-dashboard {
+    board-column {
+    } 
+
+    tile-container {
+        display: flex;
+        height: auto;
+
+        .tile {
+            flex-basis: 100%;
+            height: auto;
+        }
+    }
+}

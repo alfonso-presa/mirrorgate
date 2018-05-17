@@ -38,6 +38,7 @@ public class Feature extends BaseModel{
     private Double dEstimate;
     private String priority;
     private String url;
+    private Long timestamp;
 
     /* Associated sprint properties */
     @Indexed
@@ -66,6 +67,8 @@ public class Feature extends BaseModel{
 
     @Indexed
     private List<String> keywords;
+
+    private String teamName;
 
     public String getsId() {
         return sId;
@@ -222,5 +225,22 @@ public class Feature extends BaseModel{
     public Feature setUrl(String url) {
         this.url = url;
         return this;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public Feature setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+        return this;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 }

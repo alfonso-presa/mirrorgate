@@ -2,20 +2,7 @@
 
 const request = require('request');
 
-const MIRRORGATE_ENDPOINT = 'http://' + (process.env.DOCKER ? 'app':'localhost') + ':8080/mirrorgate';
-
-function lockUntilCompletion() {
-    if(typeof(browser) !== 'undefined') {
-        return browser.executeAsyncScript(function (cb) {
-            ServerSentEvent.addListener(function listener(eventType) {
-                if(eventType !== 'PingType') {
-                    ServerSentEvent.removeListener(listener);
-                    testability.when.ready(cb);
-                }
-            }, true);
-        });
-    }
-}
+const MIRRORGATE_ENDPOINT = 'http://' + (process.env.APP_HOST || 'localhost') + ':8080/mirrorgate';
 
 function send(endpoint, data, params) {
     var qs = '';
@@ -40,7 +27,7 @@ function send(endpoint, data, params) {
             reject(err);
             return;
           }
-    
+
           if(res.statusCode >= 400) {
             reject({
                 statusCode: res.statusCode,
@@ -69,15 +56,12 @@ var API = {
             var promise = send('issues', [toSend], {
                 collectorId: "mirrorgate-collectors-jira"
             });
-            API.__pendingChanges.push({
+            return API.__pendingChanges.push({
                 restore: function () {
                     return send('issues', [original], {
                         collectorId: "mirrorgate-collectors-jira"
-                    }).then(lockUntilCompletion);
+                    });
                 }
-            });
-            return promise.then(function () {
-                return lockUntilCompletion();
             });
         }
     },

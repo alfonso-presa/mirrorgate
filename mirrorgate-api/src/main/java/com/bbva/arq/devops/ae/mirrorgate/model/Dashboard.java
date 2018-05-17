@@ -15,8 +15,8 @@
  */
 package com.bbva.arq.devops.ae.mirrorgate.model;
 
-import com.bbva.arq.devops.ae.mirrorgate.core.utils.DashboardStatus;
-import com.bbva.arq.devops.ae.mirrorgate.core.utils.Filters;
+import com.bbva.arq.devops.ae.mirrorgate.support.DashboardStatus;
+import com.bbva.arq.devops.ae.mirrorgate.support.Filters;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -34,6 +34,7 @@ public class Dashboard extends BaseModel {
     private String displayName;
     private String logoUrl;
     private String type;
+    private List<List <String>> columns;
 
     @Indexed
     private List<String> codeRepos;
@@ -42,6 +43,8 @@ public class Dashboard extends BaseModel {
     private String sProductName; //Team product name
     private List<String> applications;
     private List<String> analyticViews;
+    private List<String> operationViews;
+    private Boolean infraCost;
     private String lastVersion;
     private Float responseTimeAlertingLevelWarning;
     private Float responseTimeAlertingLevelError;
@@ -57,6 +60,7 @@ public class Dashboard extends BaseModel {
     private String lastUserEdit;
     @Indexed
     private Long lastModification;
+    private Long lastTimeUsed;
     private String programIncrement;
     private String urlAlerts;
     private String urlAlertsAuthorization;
@@ -67,6 +71,8 @@ public class Dashboard extends BaseModel {
     private List<String> aggregatedDashboards;
 
     private Integer marketsStatsDays = 7;
+
+    private List<String> gitRepos;
 
 
     public String getName() {
@@ -152,6 +158,15 @@ public class Dashboard extends BaseModel {
 
     public Dashboard setLastUserEdit(String lastUserEdit) {
         this.lastUserEdit = lastUserEdit;
+        return this;
+    }
+
+    public Long getLastTimeUsed() {
+        return lastTimeUsed;
+    }
+
+    public Dashboard setLastTimeUsed(Long lastTimeUsed) {
+        this.lastTimeUsed = lastTimeUsed;
         return this;
     }
 
@@ -242,6 +257,24 @@ public class Dashboard extends BaseModel {
 
     public Dashboard setAnalyticViews(List<String> analyticViews) {
         this.analyticViews = analyticViews;
+        return this;
+    }
+
+    public List<String> getOperationViews() {
+        return operationViews;
+    }
+
+    public Dashboard setOperationViews(List<String> operationViews) {
+        this.operationViews = operationViews;
+        return this;
+    }
+
+    public Boolean getInfraCost() {
+        return infraCost;
+    }
+
+    public Dashboard setInfraCost(Boolean infraCost) {
+        this.infraCost = infraCost;
         return this;
     }
 
@@ -338,6 +371,15 @@ public class Dashboard extends BaseModel {
         return this;
     }
 
+    public List<List<String>> getColumns() {
+        return columns;
+    }
+
+    public Dashboard setColumns(List<List<String>> columns) {
+        this.columns = columns;
+        return this;
+    }
+
     public String getCategory() {
         return category;
     }
@@ -351,6 +393,15 @@ public class Dashboard extends BaseModel {
     }
     public Dashboard setMarketsStatsDays(Integer marketsStatsDays) {
         this.marketsStatsDays = marketsStatsDays;
+        return this;
+    }
+
+    public List<String> getGitRepos() {
+        return gitRepos;
+    }
+
+    public Dashboard setGitRepos(List<String> gitRepos) {
+        this.gitRepos = gitRepos;
         return this;
     }
 }

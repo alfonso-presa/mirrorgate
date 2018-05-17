@@ -36,6 +36,14 @@ var AggregateDashboardController = (function(dashboardId) {
 
       Service.get(Service.types.dashboard, dashboardId)
         .addListener(function(details) {
+          if(!details) {
+            for(index = 0; index < boards.length; index++) {
+              if(boards[index].id === dashboardId) {
+                boards.splice(index, 1);
+                break;
+              }
+            }
+          }
           data.detail = details;
           observable.notify(boards);
         });

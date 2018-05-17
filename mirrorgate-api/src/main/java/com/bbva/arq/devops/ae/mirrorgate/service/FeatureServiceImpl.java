@@ -15,13 +15,15 @@
  */
 package com.bbva.arq.devops.ae.mirrorgate.service;
 
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.FeatureStats;
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.IssueDTO;
+import com.bbva.arq.devops.ae.mirrorgate.dto.FeatureStats;
+import com.bbva.arq.devops.ae.mirrorgate.dto.IssueDTO;
 import com.bbva.arq.devops.ae.mirrorgate.mapper.IssueMapper;
 import com.bbva.arq.devops.ae.mirrorgate.model.EventType;
 import com.bbva.arq.devops.ae.mirrorgate.model.Feature;
 import com.bbva.arq.devops.ae.mirrorgate.repository.FeatureRepository;
 import com.bbva.arq.devops.ae.mirrorgate.repository.FeatureRepositoryImpl.ProgramIncrementNamesAggregationResult;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -34,16 +36,19 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FeatureServiceImpl implements FeatureService{
+public class FeatureServiceImpl implements FeatureService {
 
     private final FeatureRepository repository;
+    private final DashboardService dashboardService;
     private final EventService eventService;
 
     @Autowired
-    public FeatureServiceImpl(FeatureRepository repository, EventService eventService){
+    public FeatureServiceImpl(FeatureRepository repository, DashboardService dashboardService, EventService eventService){
         this.repository = repository;
+        this.dashboardService = dashboardService;
         this.eventService = eventService;
     }
+
 
     @Override
     public List<Feature> getActiveUserStoriesByBoards(List<String> boards) {
@@ -88,15 +93,31 @@ public class FeatureServiceImpl implements FeatureService{
 
         List<Feature> features = repository.findAllBysIdInAndCollectorId(ids, collectorId);
 
-        Map<String, Feature> entryMap = features.stream()
-                .collect(Collectors.toMap(Feature::getsId, (p) -> p));
+        //prevent duplicates
+        Map<String, List<Feature>> entryMap = features.stream()
+            .collect(Collectors.toMap(Feature::getsId, Arrays::asList,
+                //merger
+                (list1, list2) -> {
+                    List<Feature> list = new ArrayList<>();
+
+                    list.addAll(list1);
+                    list.addAll(list2);
+
+                    return list;
+                }));
 
         features = issues.stream()
                 .map((issue) -> {
                     String key = issue.getId().toString();
                     Feature feat = entryMap.containsKey(key) ?
-                            entryMap.get(key):
+                            entryMap.get(key).get(0):
                             new Feature();
+                    //Remove extra occurences
+                    if(entryMap.containsKey(key) && entryMap.get(key).size() > 1){
+                        for (int i = 1; i<entryMap.get(key).size();i++){
+                            repository.delete(entryMap.get(key).get(i));
+                        }
+                    }
                     return IssueMapper.map(issue, feat);
                 })
                 .collect(Collectors.toList());
@@ -104,6 +125,8 @@ public class FeatureServiceImpl implements FeatureService{
         for (Feature feat : features){
             feat.setCollectorId(collectorId);
         }
+
+        createTransientDashboardsForTeams(features);
 
         return StreamSupport.stream(repository.save(features).spliterator(), false)
                 .map((feat) -> {
@@ -132,4 +155,13 @@ public class FeatureServiceImpl implements FeatureService{
     public List<Feature> getEpicsBySNumber(List<String> keys) {
         return repository.findAllBySNumberInAndSTypeName(keys, "Epic");
     }
+
+    private void createTransientDashboardsForTeams(List<Feature> features){
+        features.stream()
+            .map(Feature::getTeamName)
+            .filter(teamName -> teamName != null && !teamName.isEmpty())
+            .distinct()
+            .forEach(teamName -> dashboardService.createDashboardForJiraTeam(teamName));
+    }
+
 }

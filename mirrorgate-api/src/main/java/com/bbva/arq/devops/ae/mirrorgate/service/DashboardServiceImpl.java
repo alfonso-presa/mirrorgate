@@ -15,24 +15,26 @@
  */
 package com.bbva.arq.devops.ae.mirrorgate.service;
 
-import static com.bbva.arq.devops.ae.mirrorgate.core.utils.DashboardStatus.ACTIVE;
-import static com.bbva.arq.devops.ae.mirrorgate.core.utils.DashboardStatus.DELETED;
-import static com.bbva.arq.devops.ae.mirrorgate.core.utils.DashboardStatus.TRANSIENT;
 import static com.bbva.arq.devops.ae.mirrorgate.mapper.DashboardMapper.map;
+import static com.bbva.arq.devops.ae.mirrorgate.support.DashboardStatus.*;
 
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.DashboardDTO;
+import com.bbva.arq.devops.ae.mirrorgate.dto.DashboardDTO;
 import com.bbva.arq.devops.ae.mirrorgate.exception.DashboardConflictException;
 import com.bbva.arq.devops.ae.mirrorgate.exception.DashboardForbiddenException;
 import com.bbva.arq.devops.ae.mirrorgate.exception.DashboardNotFoundException;
 import com.bbva.arq.devops.ae.mirrorgate.mapper.DashboardMapper;
+import com.bbva.arq.devops.ae.mirrorgate.model.Build;
 import com.bbva.arq.devops.ae.mirrorgate.model.Dashboard;
 import com.bbva.arq.devops.ae.mirrorgate.model.EventType;
 import com.bbva.arq.devops.ae.mirrorgate.model.ImageStream;
 import com.bbva.arq.devops.ae.mirrorgate.repository.DashboardRepository;
+import com.bbva.arq.devops.ae.mirrorgate.support.DashboardStatus;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
@@ -42,11 +44,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardServiceImpl.class);
     private static final Sort SORT_BY_LAST_MODIFICATION
             = new Sort(Sort.Direction.DESC, "lastModification");
 
     private final DashboardRepository dashboardRepository;
-    private EventService eventService;
+    private final EventService eventService;
 
     @Autowired
     public DashboardServiceImpl(DashboardRepository dashboardRepository, EventService eventService){
@@ -57,7 +60,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public DashboardDTO getDashboard(String name) {
         Dashboard dashboard = getRepositoryDashboard(name);
-        return map(dashboard);
+        return map(dashboardRepository.save(dashboard.setLastTimeUsed(System.currentTimeMillis())));
     }
 
     private Dashboard getRepositoryDashboard(String name) {
@@ -116,6 +119,11 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public DashboardDTO newDashboard(DashboardDTO dashboard) {
+
+        if (dashboard.getName().isEmpty()) {
+            throw new DashboardConflictException("Dashboard name must not be empty");
+        }
+
         Dashboard oldDashboard = dashboardRepository.findOneByName(dashboard.getName(), SORT_BY_LAST_MODIFICATION);
 
         if (oldDashboard != null && oldDashboard.getStatus() != DELETED) {
@@ -130,6 +138,7 @@ public class DashboardServiceImpl implements DashboardService {
             if (auth != null && null != auth.getPrincipal()) {
                 dashboard.setAuthor(auth.getPrincipal().toString());
                 dashboard.setLastUserEdit(auth.getPrincipal().toString());
+                dashboard.setAdminUsers(Arrays.asList(auth.getPrincipal().toString()));
             }
         }
 
@@ -188,8 +197,40 @@ public class DashboardServiceImpl implements DashboardService {
         return dashboardRepository.readFile(dashboardName);
     }
 
+    @Override
     public List<Dashboard> getDashboardWithNames(List<String> dashboardNames){
         return dashboardRepository.findByNameIn(dashboardNames);
+    }
+
+    @Override
+    public void createDashboardForBuildProject(Build build) {
+
+        DashboardDTO newDashboard = new DashboardDTO();
+
+        newDashboard.setCodeRepos(Arrays.asList(build.getProjectName()));
+        createTransientDashboard(newDashboard, build.getProjectName());
+    }
+
+    @Override
+    public void createDashboardForJiraTeam(String teamName) {
+
+        DashboardDTO newDashboard = new DashboardDTO();
+
+        newDashboard.setBoards(Arrays.asList(teamName));
+        createTransientDashboard(newDashboard, teamName);
+    }
+
+    private void createTransientDashboard(DashboardDTO newDashboard, String identifier){
+        try {
+            newDashboard.setName(identifier);
+            newDashboard.setDisplayName(identifier);
+            newDashboard.setStatus(DashboardStatus.TRANSIENT);
+
+            newDashboard(newDashboard);
+        } catch(DashboardConflictException e) {
+            LOGGER.warn("Error while creating transient dashboard {}. "
+                + "Dashboard already exists", identifier);
+        }
     }
 
     private Dashboard mergeDashboard(Dashboard dashboard, Dashboard request, String principal) {

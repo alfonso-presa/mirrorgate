@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-import { NgModule } from '@angular/core'
-import { RouterModule } from '@angular/router';
-import { rootRouterConfig } from './app.routes';
 import { AppComponent } from './app.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpModule } from '@angular/http';
-import { TagInputModule } from 'ngx-chips';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { ListComponent } from '../list/list.component';
-import { FormComponent } from '../form/form.component';
+import { BrowserModule } from '@angular/platform-browser';
 import { DeleteComponent } from '../delete/delete.component';
+import { DragulaModule } from 'ng2-dragula';
 import { FeedbackComponent } from '../feedback/feedback.component';
-
-import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { FormComponent } from '../form/form.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { HttpModule } from '@angular/http';
+import { ListComponent } from '../list/list.component';
+import { NgModule } from '@angular/core';
+import { rootRouterConfig } from './app.routes';
+import { RouterModule } from '@angular/router';
+import { TagInputModule } from 'ngx-chips';
 
 @NgModule({
   declarations: [
@@ -46,7 +45,8 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
     HttpModule,
     RouterModule.forRoot(rootRouterConfig, { useHash: true }),
     TagInputModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    DragulaModule
   ],
   bootstrap: [ AppComponent ]
 })

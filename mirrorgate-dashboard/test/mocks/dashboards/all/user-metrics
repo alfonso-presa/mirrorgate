@@ -5,7 +5,8 @@
     "platform" : "Unknown",
     "name" : "activeUsers",
     "value" : 6,
-    "timestamp" : "1505301880665",
+    "value": 6,
+    "timestamp" : "1516709298000",
     "collectorId" : "collector1"
   },
   {
@@ -14,7 +15,7 @@
     "platform" : "Android",
     "name" : "7dayUsers",
     "value" : 55,
-    "timestamp" : "1505301880665",
+    "timestamp" : "1516709298000",
     "collectorId" : "collector1"
   },
   {
@@ -23,7 +24,8 @@
     "platform" : "Android",
     "name" : "activeUsers",
     "value" : 12,
-    "timestamp" : "1505301880665",
+    "value": 12,
+    "timestamp" : "1516709298000",
     "collectorId" : "collector1"
   },
   {
@@ -32,7 +34,7 @@
     "platform" : "Android",
     "name" : "7dayUsers",
     "value" : 12,
-    "timestamp" : "1505301880665",
+    "timestamp" : "1516709298000",
     "collectorId" : "collector1"
   },
   {
@@ -41,7 +43,8 @@
     "platform" : "Android",
     "name" : "activeUsers",
     "value" : 12,
-    "timestamp" : "1505301880665",
+    "value": 12,
+    "timestamp" : "1516709298000",
     "collectorId" : "collector1"
   },
   {
@@ -77,6 +80,7 @@
     "platform" : "Android",
     "name" : "responseTime",
     "value" : 0.25,
+    "sampleSize" : 200,
     "timestamp" : "1505301880665",
     "collectorId" : "collector1",
     "sampleSize": 5
@@ -87,6 +91,7 @@
     "platform" : "Android",
     "name" : "responseTime",
     "value" : 0.675,
+    "sampleSize" : 300,
     "timestamp" : "1505301880665",
     "collectorId" : "collector1",
     "sampleSize": 15
@@ -97,6 +102,15 @@
     "platform" : "Android",
     "name" : "availabilityRate",
     "value" : 85,
+    "sampleSize" : 215,
+    "timestamp" : "1505301880665",
+    "collectorId" : "collector1"
+  },
+  {
+    "viewId" : "1234123",
+    "platform" : "AWS",
+    "name" : "infrastructureCost",
+    "value" : 769.23,
     "timestamp" : "1505301880665",
     "collectorId" : "collector1"
   }

@@ -3,17 +3,17 @@
     "appname": "moods",
     "votesTotal": 24,
     "ratingTotal": 100,
-    "votes7Days": 3,
-    "rating7Days": 8,
-    "votesMonth": 12,
-    "ratingMonth": 40,
+    "votesShortTerm": 3,
+    "ratingShortTerm": 8,
+    "votesLongTerm": 12,
+    "ratingLongTerm": 40,
     "platform": "IOS",
     "reviews": [
       {
         "author": "Carlos",
         "rate": 1.0,
         "timestamp": 1498814350000,
-        "comment": "Pufff!"
+        "comment": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur dignissim ex massa, in convallis ligula finibus at. Nunc vulputate ultrices ipsum eget viverra. Morbi lobortis non dui a molestie. Quisque viverra vestibulum turpis a mollis. Maecenas mollis quam nibh, vitae semper purus auctor in. Aliquam vitae venenatis lectus, nec molestie tortor. Integer rutrum libero eu varius tincidunt. Mauris varius arcu ac lectus sagittis, nec volutpat est luctus. Sed eros lorem, tristique in dapibus laoreet, tincidunt pulvinar nibh. "
       }
     ]
   },
@@ -21,10 +21,10 @@
     "appname": "moods",
     "votesTotal": 24,
     "ratingTotal": 80,
-    "votes7Days": 3,
-    "rating7Days": 14,
-    "votesMonth": 12,
-    "ratingMonth": 25,
+    "votesShortTerm": 3,
+    "ratingShortTerm": 14,
+    "votesLongTerm": 12,
+    "ratingLongTerm": 25,
     "platform": "Android",
     "reviews": [
       {

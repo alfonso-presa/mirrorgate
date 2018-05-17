@@ -23,9 +23,12 @@ export class Dashboard {
   applications: string[] = [];
   codeRepos: string[] = [];
   teamMembers: string[] = [];
+  gitRepos: string[] = [];
   boards: string[] = [];
   adminUsers: string[] = [];
   analyticViews: string[] = [];
+  operationViews: string[] = [];
+  infraCost: boolean;
   lastVersion: string;
   responseTimeAlertingLevelWarning: number;
   responseTimeAlertingLevelError: number;
@@ -46,4 +49,5 @@ export class Dashboard {
   type: string = 'Detail';
   aggregatedDashboards: string[] = [];
   marketsStatsDays: number;
+  columns: string[][] = [];
 }

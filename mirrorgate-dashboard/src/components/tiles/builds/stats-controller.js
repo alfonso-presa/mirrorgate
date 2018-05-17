@@ -41,6 +41,7 @@ var BuildsStatsController = (function(dashboardId) {
             data.stats.lastBuildTimestamp = item.timestamp;
           }
         }
+        data.stats.failureRate = data.stats.failureRate >= 0 ? parseFloat(data.stats.failureRate.toFixed(1)) : undefined;
       }
     }
 

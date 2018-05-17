@@ -55,6 +55,12 @@ var piForTesting = readJSON('test/mocks/dashboards/' + dashboardForTesting + '/p
 
 var userMetricsForTesting = readJSON('test/mocks/dashboards/' + dashboardForTesting + '/user-metrics');
 
+var scmMetricsForTesting = readJSON('test/mocks/dashboards/' + dashboardForTesting + '/scm-metrics');
+
+userMetricsForTesting.forEach( function(metric) {
+  metric.timestamp = Date.now();
+});
+
 //Placeholder to avoid Server Sent Events error
 var EventSource = function (){
   this.addEventListener = function () {};
@@ -170,6 +176,16 @@ function buildFakeServer() {
       JSON.stringify(userMetricsForTesting)
     ]
   );
+
+  server.respondWith(
+      'GET',
+      'dashboards/' + dashboardForTesting + '/scm-metrics',
+      [
+        200,
+        { "Content-Type": "application/json" },
+        JSON.stringify(scmMetricsForTesting)
+      ]
+    );
 
   return server;
 

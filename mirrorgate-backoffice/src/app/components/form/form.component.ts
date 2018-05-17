@@ -15,7 +15,7 @@
  */
 
 import {Component} from '@angular/core';
-import {OnInit} from '@angular/core';
+import {OnInit, AfterViewChecked} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {kebabCase} from 'lodash';
 
@@ -26,12 +26,13 @@ import {RequestOptions} from '@angular/http/http';
 
 import {TextsService} from '../../services/texts.service';
 import {ConfigService} from '../../services/config.service';
+import {DragulaService} from 'ng2-dragula';
 
 @Component({
   selector: 'new-and-edit-form',
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss'],
-  providers: [DashboardsService, SlackService, TextsService, ConfigService]
+  providers: [DashboardsService, SlackService, TextsService, ConfigService, DragulaService]
 })
 export class FormComponent {
   backToDashboard: boolean;
@@ -39,15 +40,22 @@ export class FormComponent {
   slackChannels: {keys?: string[], values?: Map<string, string>} = {};
   slack: {clientId?: string, clientSecret?: string} = {};
   edit: boolean = false;
+  columnsUpdated: boolean = false;
   temp: {
+    displayName?: string,
+    logoUrl?: string,
     applications?: string,
     boards?: string,
+    programIncrement?: string,
     codeRepos?: string,
     adminUsers?: {
       display?: string,
       value?: string
     }[],
+    gitRepos?: string,
     analyticViews?: string,
+    operationViews?: string,
+    infraCost?: boolean,
     aggregatedDashboards?: {
       display?: string,
       value?: string
@@ -56,6 +64,10 @@ export class FormComponent {
       display?: string,
       value?: string
     }[],
+    lastVersion?: string,
+    slackTeam?: string,
+    urlAlerts?: string,
+    urlAlertsAuthorization?: string
   } = {};
   errorMessage: string;
   url: string;
@@ -66,6 +78,9 @@ export class FormComponent {
     value?: string
   }[];
   marketsStatsDays: number;
+  dashboardList: string[] = [];
+
+  readonly MAX_COLUMNS = 5;
 
   constructor(
       private dashboardsService: DashboardsService,
@@ -73,7 +88,8 @@ export class FormComponent {
       private slackService: SlackService,
       private router: Router,
       private route: ActivatedRoute,
-      private configService: ConfigService) {}
+      private configService: ConfigService,
+      private dragulaService: DragulaService) {}
 
   ngOnInit(): void {
     let id = this.route.snapshot.params['id'];
@@ -106,6 +122,34 @@ export class FormComponent {
         this.texts.loaded = true;
       })
       .catch((error: any) => { this.errorMessage = <any>error; });
+
+    this.dashboardsService.getDashboards().then(dashboards => {
+      this.dashboardList = dashboards.map(dashboard => dashboard.name);
+    });
+
+    this.dragulaService.setOptions('columns', {
+
+      revertOnSpill: true,
+
+      accepts: function(el, target, source) {
+
+        if(target.classList.contains('dashboard-cols-template')){
+          var elements = target.getElementsByClassName('dashboard-cols-module');
+          var total_size = 0;
+
+          for(var i = 0; i < elements.length; i++){
+            total_size += Number(elements[i].getAttribute('size'));
+            if(total_size > 4){
+              return false;
+            }
+          }
+        }
+
+        return true;
+      },
+
+    });
+
   }
 
   setDashboard(dashboard: Dashboard) {
@@ -114,8 +158,14 @@ export class FormComponent {
     }
 
     this.dashboard = dashboard;
+    this.temp.displayName =
+        this.dashboard.displayName ? this.dashboard.displayName : '';
+    this.temp.logoUrl =
+        this.dashboard.logoUrl ? this.dashboard.logoUrl : '';
     this.temp.boards =
         this.dashboard.boards ? this.dashboard.boards.join(',') : '';
+    this.temp.programIncrement =
+        this.dashboard.programIncrement ? this.dashboard.programIncrement : '';
     this.temp.applications = this.dashboard.applications ?
         this.dashboard.applications.join(',') :
         '';
@@ -125,6 +175,8 @@ export class FormComponent {
         this.dashboard.adminUsers.map((e) => {
           return { display: e, value: e }
         }) : [];
+    this.temp.gitRepos =
+        this.dashboard.gitRepos ? this.dashboard.gitRepos.join(',') : '';
     this.temp.aggregatedDashboards = this.dashboard.aggregatedDashboards ?
         this.dashboard.aggregatedDashboards.map((e) => {
           return { display: e, value: e }
@@ -132,17 +184,35 @@ export class FormComponent {
     this.temp.analyticViews = this.dashboard.analyticViews ?
         this.dashboard.analyticViews.join(',') :
         '';
+    this.temp.operationViews = this.dashboard.operationViews ?
+            this.dashboard.operationViews.join(',') :
+            '';
+    this.temp.infraCost = this.dashboard.infraCost || false;
     this.temp.teamMembers = this.dashboard.teamMembers ?
         this.dashboard.teamMembers.map((e) => {
           return { display: e, value: e }
         }) : [];
+    this.temp.lastVersion =
+        this.dashboard.lastVersion ? this.dashboard.lastVersion : '';
+    this.temp.slackTeam =
+        this.dashboard.slackTeam ? this.dashboard.slackTeam : '';
+    this.temp.urlAlerts =
+        this.dashboard.urlAlerts ? this.dashboard.urlAlerts : '';
+    this.temp.urlAlertsAuthorization =
+        this.dashboard.urlAlertsAuthorization ? this.dashboard.urlAlertsAuthorization : '';
     this.updateSlackChannels();
   }
 
   mirrorTempValues() {
+    this.dashboard.displayName = this.temp.displayName.length ?
+        this.temp.displayName.trim() : undefined;
+    this.dashboard.logoUrl = this.temp.logoUrl.length ?
+        this.temp.logoUrl.trim() : undefined;
     this.dashboard.boards = this.temp.boards.length ?
         this.temp.boards.split(',').map((e) => e.trim()) :
         undefined;
+    this.dashboard.programIncrement = this.temp.programIncrement.length ?
+        this.temp.programIncrement.trim() : undefined;
     this.dashboard.applications = this.temp.applications.length ?
         this.temp.applications.split(',').map((e) => e.trim()) :
         undefined;
@@ -152,15 +222,30 @@ export class FormComponent {
     this.dashboard.adminUsers = this.temp.adminUsers.length ?
         this.temp.adminUsers.map((e) => e.value.split('@')[0].trim()) :
         undefined;
+    this.dashboard.gitRepos = this.temp.gitRepos.length ?
+        this.temp.gitRepos.split(',').map((e) => e.trim()) :
+        undefined;
     this.dashboard.aggregatedDashboards = this.temp.aggregatedDashboards.length ?
         this.temp.aggregatedDashboards.map((e) => e.value.trim()) :
         undefined;
     this.dashboard.analyticViews = this.temp.analyticViews.length ?
         this.temp.analyticViews.split(',').map((e) => e.trim()) :
         undefined;
+    this.dashboard.operationViews = this.temp.operationViews.length ?
+            this.temp.operationViews.split(',').map((e) => e.trim()) :
+            undefined;
+    this.dashboard.infraCost = this.temp.infraCost || false;
     this.dashboard.teamMembers = this.temp.teamMembers.length ?
         this.temp.teamMembers.map((e) => e.value.split('@')[0].trim()) :
         undefined;
+    this.dashboard.lastVersion = this.temp.lastVersion.length ?
+        this.temp.lastVersion.trim() : undefined;
+    this.dashboard.slackTeam = this.temp.slackTeam.length ?
+        this.temp.slackTeam.trim() : undefined;
+    this.dashboard.urlAlerts = this.temp.urlAlerts.length ?
+        this.temp.urlAlerts.trim() : undefined;
+    this.dashboard.urlAlertsAuthorization = this.temp.urlAlertsAuthorization.length ?
+        this.temp.urlAlertsAuthorization.trim() : undefined;
     if (!this.edit) {
       this.dashboard.name = kebabCase(this.dashboard.displayName);
     }
@@ -176,6 +261,23 @@ export class FormComponent {
     }
   }
 
+  private updateColumns() {
+    if (this.columnsUpdated || !this.dashboard || !this.dashboard.columns || !document.getElementById('columns')) {
+      return;
+    }
+
+    this.columnsUpdated = true;
+
+    this.dashboard.columns.forEach((column, index) => {
+      let column_element = document.getElementById(`col${index+1}`);
+      column.forEach(id => {
+        let module_element  = document.getElementById(id)
+        column_element.appendChild(module_element);
+      });
+    });
+
+  }
+
   private updateSlackChannels(): void {
     this.slackService.getChannels(this.dashboard).then((channels) => {
       this.slackChannels.values = channels;
@@ -189,6 +291,7 @@ export class FormComponent {
   }
 
   onSave(dashboard: Dashboard): void {
+    document.getElementById('dynamicDashboardConfiguration') && this.saveColumns(dashboard);
     this.dashboardsService.saveDashboard(dashboard, this.edit)
         .then(dashboard => {
           if (dashboard) {
@@ -197,6 +300,17 @@ export class FormComponent {
           }
         })
         .catch((error: any) => { this.errorMessage = <any>error; });
+  }
+
+  private saveColumns(dashboard: Dashboard) {
+    dashboard.columns = [];
+
+    for(let i = 0; i < this.MAX_COLUMNS; i++){
+      this.dashboard.columns[i] = []
+      Array.from(document.getElementById(`col${i+1}`).children).forEach(el => {
+        this.dashboard.columns[i][this.dashboard.columns[i].length] = el.id;
+      });
+    };
   }
 
   signSlack(dashboard: Dashboard): void {
@@ -227,4 +341,9 @@ export class FormComponent {
           });
     }
   }
+
+  ngAfterViewChecked() {
+    this.updateColumns();
+  }
+
 }

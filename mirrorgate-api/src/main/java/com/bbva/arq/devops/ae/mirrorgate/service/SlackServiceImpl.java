@@ -18,12 +18,13 @@ package com.bbva.arq.devops.ae.mirrorgate.service;
 import allbegray.slack.SlackClientFactory;
 import allbegray.slack.type.Channel;
 import allbegray.slack.webapi.SlackWebApiClient;
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.SlackDTO;
+import com.bbva.arq.devops.ae.mirrorgate.dto.SlackDTO;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -50,8 +51,7 @@ public class SlackServiceImpl implements SlackService {
     }
 
     @Override
-    public SlackDTO getWebSocket(String team, String token) {
-
+    public SlackDTO getWebSocket(String team, String token) throws ResourceAccessException {
         UriComponents uri = UriComponentsBuilder.newInstance()
                 .scheme("https")
                 .host(team + ".slack.com")

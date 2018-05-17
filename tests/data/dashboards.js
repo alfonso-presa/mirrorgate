@@ -2,6 +2,13 @@ db.getCollection('dashboards').insertMany([
     {
         "name":"mirrorgate",
         "logoUrl":"/mirrorgate/img/logo.png",
+        "type" : "Custom",
+        "columns":[
+          [ "bugs", "current-sprint", "next-sprint" ],
+          [ "scm-metrics", "builds", "buildsstats" ],
+          [ "program-increment"],
+          [ "markets", "reviews", "user-metrics", "operations" ]
+        ],
         "codeRepos":[
             "mirrorgate-app",
             "MirrorGate",
@@ -12,7 +19,11 @@ db.getCollection('dashboards').insertMany([
         "boards":[
             "MirrorGate"
         ],
-        "analyticViews": ["1234123"]
+        'programIncrement': 'MG[0-9]{2}',
+        "analyticViews": ["1234123"],
+        "gitRepos": [
+          "ssh://git@fake.com:fake/repo1.git"
+        ]
     },
     {
         "name":"all-the-stuff",
@@ -23,6 +34,13 @@ db.getCollection('dashboards').insertMany([
             "MirrorGate",
             "jira-collector",
             "design"
+        ],
+        "columns": [
+            ["scm-metrics","current-sprint","bugs"],
+            ["program-increment","next-sprint"],
+            ["builds","buildsstats"],
+            ["markets","reviews","user-metrics","operations-metrics"],
+            ["alerts"]
         ],
         "applications":['moods'],
         "boards":[

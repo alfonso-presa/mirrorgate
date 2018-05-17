@@ -43,8 +43,8 @@ public class FeatureRepositoryImplTest {
 
     @Before
     public void init(){
-        featureRepository.save(createFeature(Arrays.asList("PI1","PI2","PI3"), "feature1"));
-        featureRepository.save(createFeature(Arrays.asList("PI3","PI4","PI5"), "feature2"));
+        featureRepository.save(createFeature(Arrays.asList("PI2","PI5","PI3"), "feature1"));
+        featureRepository.save(createFeature(Arrays.asList("PI3","PI4","PI1"), "feature2"));
         featureRepository.save(createActiveStory("mirrorgate", "feature1"));
         featureRepository.save(createActiveStory("not_mirrorgate", "feature1"));
         featureRepository.save(createActiveStory("mirrorgate", "feature2"));
@@ -60,7 +60,7 @@ public class FeatureRepositoryImplTest {
     public void testFeatureAndPIComeFromTeam(){
         List<String> boardPIFeatures = featureRepository.programIncrementBoardFeatures(Arrays.asList("mirrorgate"), Arrays.asList("feature1", "feature2"));
 
-        assertEquals(boardPIFeatures.size(), 2);
+        assertEquals(2, boardPIFeatures.size());
     }
 
 
@@ -79,7 +79,7 @@ public class FeatureRepositoryImplTest {
     @Test
     public void testAggregationWithoutResults(){
         ProgramIncrementNamesAggregationResult piNames = featureRepository.getProductIncrementFromPiPattern(Pattern.compile("aaa"));
-        assertEquals(piNames, null);
+        assertEquals(null, piNames);
     }
 
     private Feature createFeature(List<String> piNames, String sNumber){

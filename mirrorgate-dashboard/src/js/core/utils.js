@@ -18,6 +18,8 @@ var Utils = (function() {
   'use strict';
 
   var breakFavIconTimeout;
+  var breakTimeout;
+
   var colorMapping = {
     'daa038' : 'yellow', // Warning status color for Slack
     'd00000': 'red', // Danger status color for Slack
@@ -25,20 +27,50 @@ var Utils = (function() {
     'yellow': 'yellow'
   };
 
+  var notification;
+
+  document.addEventListener('Message', checkNotification);
+  document.addEventListener('HeadsUp', checkNotification);
+  document.addEventListener('Message', notifyFavIcon);
+  document.addEventListener('HeadsUp', notifyFavIcon);
+
+  function checkNotification(data) {
+    if(data && data.detail && data.detail.description.indexOf('MIRRORBREAK!') >= 0) {
+      document.getElementById('easter-egg').style.display = 'block';
+      if(breakTimeout) {
+        clearTimeout(breakTimeout);
+      }
+      breakTimeout = setTimeout(function () {
+        document.getElementById('easter-egg').style.display = 'none';
+        breakTimeout = undefined;
+      }, 60000);
+    } else if (Notification.permission === "granted") {
+      if (data && data.detail) {
+        if(notification) {
+          notification.close();
+        }
+        notification = new Notification('MirrorGate Notification: ' + (data.detail.title || ''), {
+          body: data.detail.description || '',
+          icon: 'img/favicon-' + (colorMapping[data.detail.color] || 'blue') + '.png'
+        });
+      }
+    }
+  }
+
   function notifyFavIcon(event) {
     if(event && event.detail) {
-      console.log(event.detail.color);
-
       var icon = document.querySelector('link[rel*="icon"]');
 
-      icon.href = 'img/favicon-' + (colorMapping[event.detail.color] || 'blue') + '.png';
-      if(breakFavIconTimeout) {
-        clearTimeout(breakFavIconTimeout);
+      if(icon) {
+        icon.href = 'img/favicon-' + (colorMapping[event.detail.color] || 'blue') + '.png';
+        if(breakFavIconTimeout) {
+          clearTimeout(breakFavIconTimeout);
+        }
+        breakFavIconTimeout = setTimeout(function() {
+          icon.href = 'img/favicon.png';
+          breakFavIconTimeout = undefined;
+        }, 60000);
       }
-      breakFavIconTimeout = setTimeout(function() {
-        icon.href = 'img/favicon.png';
-        breakFavIconTimeout = undefined;
-      }, 60000);
     }
   }
 
@@ -76,9 +108,6 @@ var Utils = (function() {
 
     throw new Error('Unable to copy obj! Its type isn\'t supported.');
   }
-
-  document.addEventListener('NotificationEvent', notifyFavIcon);
-  document.addEventListener('SlackEvent', notifyFavIcon);
 
   return {
 
@@ -158,6 +187,13 @@ var Utils = (function() {
       return false;
     },
 
+    openReleaseNotes: function () {
+      window.mirrorGateConfig().then(function (config) {
+        document.location.href = config.docsUrl + '/changelog.html';
+      });
+      return false;
+    },
+
     compareVersions: function (version1, version2, regExp) {
 
       var v1parts = regExp.exec(version1) || [];
@@ -206,6 +242,10 @@ var Utils = (function() {
       r.estimate = r.sigma * z + r.avg;
       return r;
     },
+
+    getPercentageDifference: function (longPeriod, shortPeriod) {
+      return longPeriod ? ((shortPeriod - longPeriod) / longPeriod) * 100 : 0;
+    }
   };
 
 })();

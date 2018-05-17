@@ -15,11 +15,11 @@
  */
 package com.bbva.arq.devops.ae.mirrorgate.utils;
 
-import static com.bbva.arq.devops.ae.mirrorgate.core.dto.FailureTendency.*;
+import static com.bbva.arq.devops.ae.mirrorgate.dto.FailureTendency.*;
 import static com.bbva.arq.devops.ae.mirrorgate.utils.BuildStatsUtils.failureTendency;
 import static org.junit.Assert.assertEquals;
 
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.BuildStats;
+import com.bbva.arq.devops.ae.mirrorgate.dto.BuildStats;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -33,7 +33,7 @@ public class BuildStatsUtilsTests {
 
         assertEquals(stats.getCount(), 0);
         assertEquals(stats.getDuration(), .0,0);
-        assertEquals(stats.getFailureRate(), 0);
+        assertEquals(stats.getFailureRate(), .0, 0);
 
     }
 
@@ -43,8 +43,8 @@ public class BuildStatsUtilsTests {
         BuildStats stats = BuildStatsUtils.combineBuildStats(new BuildStats());
 
         assertEquals(stats.getCount(), 0);
-        assertEquals(stats.getDuration(), .0,0);
-        assertEquals(stats.getFailureRate(), 0);
+        assertEquals(stats.getDuration(), .0, 0);
+        assertEquals(stats.getFailureRate(), .0, 0);
 
     }
 
@@ -68,7 +68,7 @@ public class BuildStatsUtilsTests {
                 new BuildStats().setCount(3).setFailureRate(100)
         );
 
-        assertEquals(stats.getFailureRate(), 50);
+        assertEquals(stats.getFailureRate(), 50.0, 0);
 
     }
 

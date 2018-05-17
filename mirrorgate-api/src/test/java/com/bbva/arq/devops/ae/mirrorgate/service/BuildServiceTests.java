@@ -21,12 +21,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.BuildDTO;
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.DashboardDTO;
+import com.bbva.arq.devops.ae.mirrorgate.dto.BuildDTO;
+import com.bbva.arq.devops.ae.mirrorgate.dto.DashboardDTO;
 import com.bbva.arq.devops.ae.mirrorgate.model.Build;
-import com.bbva.arq.devops.ae.mirrorgate.model.Dashboard;
+import com.bbva.arq.devops.ae.mirrorgate.model.BuildSummary;
 import com.bbva.arq.devops.ae.mirrorgate.repository.BuildRepository;
+import com.bbva.arq.devops.ae.mirrorgate.repository.BuildSummaryRepository;
 import com.bbva.arq.devops.ae.mirrorgate.support.TestObjectFactory;
+import com.bbva.arq.devops.ae.mirrorgate.utils.LocalDateTimeHelper;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -42,6 +45,9 @@ public class BuildServiceTests {
     private BuildRepository buildRepository;
 
     @Mock
+    private BuildSummaryRepository buildSummaryRepository;
+
+    @Mock
     private EventService eventService;
 
     @Mock
@@ -49,7 +55,6 @@ public class BuildServiceTests {
 
     @InjectMocks
     private BuildServiceImpl buildService;
-
 
     @Test
     public void getAllBranchesLastByRepoName() {
@@ -119,12 +124,14 @@ public class BuildServiceTests {
         BuildDTO request = TestObjectFactory.createBuildDTO();
 
         when(dashboardService.getDashboard(anyString())).thenReturn(new DashboardDTO());
-        when(buildRepository.save((Build)any())).thenReturn(build);
+        when(buildRepository.save((Build) any())).thenReturn(build);
 
         BuildDTO b = buildService.createOrUpdate(request);
 
-        verify(buildRepository, times(1)).save((Build)any());
-        verify(dashboardService, times(1)).newDashboard((DashboardDTO) any());
+        verify(buildSummaryRepository, times(1)).findByRepoNameAndProjectNameAndTimestamp(request.getRepoName(), request.getProjectName(), LocalDateTimeHelper.getTimestampPeriod(request.getTimestamp(), ChronoUnit.DAYS));
+        verify(buildSummaryRepository, times(1)).save((BuildSummary) any());
+        verify(buildRepository, times(1)).save((Build) any());
+        verify(dashboardService, times(1)).createDashboardForBuildProject((Build) any());
 
         assertThat(b.getBuildUrl()).isEqualTo(build.getBuildUrl());
     }

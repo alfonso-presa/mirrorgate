@@ -18,16 +18,15 @@ package com.bbva.arq.devops.ae.mirrorgate.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.BugDTO;
-import com.bbva.arq.devops.ae.mirrorgate.core.dto.DashboardDTO;
-import com.bbva.arq.devops.ae.mirrorgate.core.utils.BugPriority;
-import com.bbva.arq.devops.ae.mirrorgate.core.utils.BugStatus;
-import com.bbva.arq.devops.ae.mirrorgate.core.utils.IssueStatus;
-import com.bbva.arq.devops.ae.mirrorgate.core.utils.IssueType;
-import com.bbva.arq.devops.ae.mirrorgate.model.Dashboard;
+import com.bbva.arq.devops.ae.mirrorgate.dto.BugDTO;
+import com.bbva.arq.devops.ae.mirrorgate.dto.DashboardDTO;
 import com.bbva.arq.devops.ae.mirrorgate.model.Feature;
 import com.bbva.arq.devops.ae.mirrorgate.repository.FeatureRepository;
 import com.bbva.arq.devops.ae.mirrorgate.support.TestObjectFactory;
+import com.bbva.arq.devops.ae.mirrorgate.support.BugPriority;
+import com.bbva.arq.devops.ae.mirrorgate.support.BugStatus;
+import com.bbva.arq.devops.ae.mirrorgate.support.IssueStatus;
+import com.bbva.arq.devops.ae.mirrorgate.support.IssueType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,10 +36,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
 
-/**
- *
- * @author enrique
- */
 @RunWith(SpringRunner.class)
 public class BugServiceTests {
 
@@ -61,7 +56,7 @@ public class BugServiceTests {
         bugs.add(bug1);
         bugs.add(bug2);
 
-        when(featureRepository.findBySProjectNameInAndSTypeNameAndSStatusNot(
+        when(featureRepository.findByKeywordsInAndSTypeNameAndSStatusNot(
                 Arrays.asList(dashboard.getName()),
                 IssueType.BUG.getName(),
                 IssueStatus.DONE.getName())
@@ -70,7 +65,7 @@ public class BugServiceTests {
         List<BugDTO> activeBugsByDashboardName
                 = bugService.getActiveBugsByBoards(Arrays.asList(dashboard.getName()));
         verify(featureRepository, times(1))
-                .findBySProjectNameInAndSTypeNameAndSStatusNot(
+                .findByKeywordsInAndSTypeNameAndSStatusNot(
                         Arrays.asList(dashboard.getName()),
                         IssueType.BUG.getName(),
                         IssueStatus.DONE.getName()

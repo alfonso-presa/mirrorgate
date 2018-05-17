@@ -14,27 +14,10 @@
  * limitations under the License.
  */
 
-.page-component {
-  width: 100%;
-}
-
-@include host('.keep-height') {
-  .component__body {
-    height: auto;
-    min-height: auto;
-    flex-basis: unset;
-  }
-}
-
-.component {
+.tile {
     background-color: $component-background-color;
     display: flex;
-    width: 100%;
-    margin: 0 auto;
-    overflow: hidden;
-    //display: block;
-
-    max-height: 100%;
+    height: 100%;
 
     &.component-wrapper, &.component-host {
       background:transparent;
@@ -62,6 +45,8 @@
         margin: 0 auto;
         height: 100%;
         width: 100%;
+        max-width: 35vw;
+        max-height: 90%;
     }
 }
 
@@ -71,9 +56,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin: 10px 0;
     min-height: 10px;
-    padding: 0 10px;
+    padding: 15px 15px 10px 15px;
     width: 100%;
 }
 
@@ -101,10 +85,15 @@
 
 
 .indicator__bar {
-  padding: 0;
   display: flex;
   clear: both;
+  padding: 0;
+  padding-bottom: 15px;
   width: 100%;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
 
   .indicator {
     line-height: 1em;
@@ -117,12 +106,12 @@
     }
 
     .stats{
-        font-size: 2.2em;
+        font-size: 2.15em;
         line-height: 0.9em;
     }
 
     .stat-desc{
-        font-size: $level-6;
+        font-size: $level-5;
         padding: 0 3px;
     }
 
@@ -174,13 +163,13 @@
   width: 100%;
   box-sizing: border-box;
   background-color: transparent;
-  height: 2.5rem;
+  height: 2.2rem;
   box-shadow: none;
   padding-right: 5px;
   display: block;
 
   .progress__bar {
-    height: 1.3rem;
+    height: 1rem;
     box-sizing: border-box;
     float: left;
     display: block;
@@ -206,7 +195,7 @@
 //Modules states backgrounds
 $border-width: -5px;
 
-.component {
+.tile {
     &.module-ok {
         box-shadow: inset 0 $border-width 0 $darker-grey;
     }
@@ -219,17 +208,17 @@ $border-width: -5px;
         box-shadow: inset 0 $border-width 0 $red;
     }
 
-    &.module-warning--level-2, &.module-warning.tile--primary {
+    &.module-warning--level-2, &.module-warning[data-size="l"], &.module-warning.tile--primary{
         @extend .module-warning;
         background: $module-warning-background !important;
     }
 
-    &.module-error--level-2, &.module-error.tile--primary{
+    &.module-error--level-2, &.module-error[data-size="l"], &.module-error.tile--primary{
         @extend .module-error;
         background: $module-error-background !important;
     }
 
-    &.module-ok--level-2, &.module-ok.tile--primary {
+    &.module-ok--level-2, &.module-ok[data-size="l"], &.module-ok.tile--primary {
         @extend .module-ok;
         background: $module-ok-background !important;
     }
@@ -264,7 +253,7 @@ tile-container.module-data-error {
     display: flex;
     flex-grow: 0;
     flex-wrap: wrap;
-    font-size: $level-6;
+    font-size: $level-5;
     justify-content: center;
     margin: 0 auto;
     padding: 0 10px 20px 10px;
@@ -312,7 +301,7 @@ tile-container.module-data-error {
 
 // RESPONIVE
 @media all and (min-width: $l) {
-    .component{
+    .tile{
         margin: 0 auto;
         max-width: 100%;
     }
@@ -339,12 +328,8 @@ tile-container.module-data-error {
 }
 
 @media all and (min-width: $xxl) {
-    .component{
+    .tile{
         margin: 0 auto;
-    }
-
-    .component__header {
-        padding: 10px 20px;
     }
 
     .subtitle {
@@ -540,43 +525,70 @@ svg {
 .tendency {
 
   &::before {
+    content: '~';
+    display: inline-block;
     font-size: 1.5rem;
     padding-right: 4px;
-    content: '~';
+    position: relative;
+    width: 0.9vw;
   }
-
+  
   &.tendency-oneup::before {
     content: url(../img/top_arrow.svg);
-    width: 16px;
-    display: inline-block;
   }
 
   &.tendency-twoup::before {
     content: url(../img/top_arrow_double.svg);
-    width: 16px;
-    display: inline-block;
   }
 
   &.tendency-threeup::before {
     content: url(../img/top_arrow_triple.svg);
-    width: 16px;
-    display: inline-block;
   }
 
   &.tendency-onedown::before {
     content: url(../img/down_arrow.svg);
-    width: 16px;
-    display: inline-block;
   }
 
   &.tendency-twodown::before {
     content: url(../img/down_arrow_double.svg);
-    width: 16px;
-    display: inline-block;
   }
 
   &.tendency-threedown::before {
     content: url(../img/down_arrow_triple.svg);
+  }
+
+  &.tendency-oneup-red::before {
+    content: url(../img/top_arrow_red.svg);
+    width: 16px;
+    display: inline-block;
+  }
+
+  &.tendency-twoup-red::before {
+    content: url(../img/top_arrow_double_red.svg);
+    width: 16px;
+    display: inline-block;
+  }
+
+  &.tendency-threeup-red::before {
+    content: url(../img/top_arrow_triple_red.svg);
+    width: 16px;
+    display: inline-block;
+  }
+
+  &.tendency-onedown-green::before {
+    content: url(../img/down_arrow_green.svg);
+    width: 16px;
+    display: inline-block;
+  }
+
+  &.tendency-twodown-green::before {
+    content: url(../img/down_arrow_double_green.svg);
+    width: 16px;
+    display: inline-block;
+  }
+
+  &.tendency-threedown-green::before {
+    content: url(../img/down_arrow_triple_green.svg);
     width: 16px;
     display: inline-block;
   }

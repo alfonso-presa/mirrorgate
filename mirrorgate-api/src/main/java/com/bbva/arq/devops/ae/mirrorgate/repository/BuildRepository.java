@@ -17,10 +17,9 @@
 package com.bbva.arq.devops.ae.mirrorgate.repository;
 
 import com.bbva.arq.devops.ae.mirrorgate.model.Build;
+import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.data.repository.CrudRepository;
-
-import java.util.List;
 
 /**
  * Builds repository.
@@ -32,4 +31,6 @@ public interface BuildRepository extends CrudRepository<Build, ObjectId>, BuildR
     List<Build> findAllByRepoNameAndProjectNameAndBranchAndLatestIsTrue(String repoName, String projectName, String branch);
 
     List<Build> findByIdIn(List<ObjectId> buildIds);
+
+    List<Build> findAllByTimestampAfter(long timestamp);
 }

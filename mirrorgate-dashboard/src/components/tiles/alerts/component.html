@@ -39,6 +39,7 @@
           </div>
 
           <div class="alert alert__state" rv-pclass-alert-state="alert.state" rv-each-alert="alerts.children">
+            <div class="fa"></div>
             <div class="image" rv-if="alert.image">
               <img rv-if="alert.image.url" rv-src="alert.image.url"></img>
               <span rv-if="alert.image.glyphName" rv-class="alert.image.glyphName"></span>
@@ -77,6 +78,9 @@
         model.alerts = data.alert_groups.slice(0,3);
         model.alerts.forEach(function(group) {
           group.children = group.children.slice(0,Math.round(15 / model.alerts.length));
+          group.children.forEach(function(alert) {
+            alert.state = alert.state != 'green' && alert.state != 'red' ? 'yellow' : alert.state;
+          });
         }, this);
         model.count = data.alert_groups.length;
       }
